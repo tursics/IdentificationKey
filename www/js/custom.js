@@ -65,6 +65,26 @@ $( document).on( "pageshow", "#pageLoadJSON", function()
 	$( '#pageLoadJSONContent').html( txt);
 	$( '#pageLoadJSONContent').trigger( 'create');
 	$( '#pageLoadJSONContent').trigger( 'updatelayout');
+
+	$.mobile.loading( "show", {
+		text: 'Bin gleich fertig',
+		textVisible: true,
+		theme: 'b',
+		textonly: false,
+		html: ''});
+
+	var url = 'https://b-content.com/projects/davinci/compress_Haeufige_Voegel_in_Gaerten_und_Siedlungen.json';
+	var jqxhr = $.ajax( url)
+	.done( function( data) {
+//		var result = $.parseJSON( data);
+	})
+//	.fail( function() {
+//		alert( "error" );
+//	})
+	.always( function() {
+	$.mobile.loading( "hide" );
+	});
+
 });
 
 // -----------------------------------------------------------------------------
