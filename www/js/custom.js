@@ -22,6 +22,7 @@ $( document).bind( 'pagebeforechange', function( e, data)
 		var re = /^#loadJSON/;
 		if( url.hash.search(re) !== -1) {
 			$( '#pageLoadJSON').data( 'data-query', vars);
+			$( '#pageLoadJSON').data( 'data-id', 1);
 			$.mobile.changePage( '#pageLoadJSON', data.options);
 			e.preventDefault();
 		}
@@ -66,25 +67,86 @@ $( document).on( "pageshow", "#pageLoadJSON", function()
 	$( '#pageLoadJSONContent').trigger( 'create');
 	$( '#pageLoadJSONContent').trigger( 'updatelayout');
 
-	$.mobile.loading( "show", {
+	$.mobile.loading( 'show', {
 		text: 'Bin gleich fertig',
 		textVisible: true,
 		theme: 'b',
 		textonly: false,
 		html: ''});
 
-	var url = 'https://b-content.com/projects/davinci/compress_Haeufige_Voegel_in_Gaerten_und_Siedlungen.json';
-	var jqxhr = $.ajax( url)
-	.done( function( data) {
-//		var result = $.parseJSON( data);
-	})
-//	.fail( function() {
-//		alert( "error" );
-//	})
-	.always( function() {
-	$.mobile.loading( "hide" );
-	});
+	// http://offene-naturfuehrer.de/web/Attribut:Exchange_4_URI
+	// var url = 'https://b-content.com/projects/davinci/compress_Haeufige_Voegel_in_Gaerten_und_Siedlungen.json';
+	// var url = 'http://offene-naturfuehrer.de/w/media/MobileKey/Haeufige_Voegel_in_Gaerten_und_Siedlungen/Haeufige_Voegel_in_Gaerten_und_Siedlungen.json';
+	// var url = 'http://offene-naturfuehrer.de/w/media/MobileKey/Amphibien_und_Reptilien/Amphibien_und_Reptilien.json';
+	// var url = 'http://offene-naturfuehrer.de/w/media/MobileKey/Bestimmungshilfe_fuer_holzige_Pflanzen_in_Deutschland_(KeyToNature)/Bestimmungshilfe_fuer_holzige_Pflanzen_in_Deutschland_(KeyToNature).json';
+	// var url = 'http://offene-naturfuehrer.de/w/media/MobileKey/Testschluessel/Testschluessel.json';
+	var url = 'data/compress_Haeufige_Voegel_in_Gaerten_und_Siedlungen.json';
 
+	$.getJSON( url, function( data) {
+		$.mobile.loading( 'hide');
+		try {
+			txt = '';
+
+			var id = $( '#pageLoadJSON').data( 'data-id');
+			var decision = $( '#pageLoadJSON').data( 'data-decision');
+
+			if( typeof id === 'undefined') {
+				id = 1;
+			}
+
+			txt += '<header>';
+			txt += '<h1>Vögel in Gärten und Siedlungen <small id="log">';
+//			txt += '<a href="?x" id="start">start</a>';
+//			txt += '<a id="next" style="float:right;margin-right:30px" href="?id=<? ';
+//			txt += 'if(isset($_GET['id'])) echo nextId($_GET['id']);
+//			txt += 'else echo nextId(getFirst ()) ?>">next</a>';
+			txt += '</small></h1>';
+			txt += '</header>';
+
+			txt += '<div id="wrapper">';
+			txt += '<div id="main">';
+			if( typeof id === 'undefined') {
+				txt += showall( getFirst());
+			} else {
+				txt += showall( id);
+			}
+			txt += '</div>';
+			txt += '</div>';
+
+			txt += '<footer>';
+			txt += '<a href="?x" id="startbottom">start</a> ';
+			txt += '<a id="nextbottom" href="?id=';
+			if( typeof id === 'undefined') {
+				txt += nextId( getFirst());
+			} else {
+				txt += nextId( id);
+			}
+			txt += '">(zum Testen. next) </a>';
+			txt += '<small>';
+			if( typeof decision === 'undefined') {
+			} else {
+				txt += decision;
+			}
+			txt += '</small>';
+			txt += '</footer>';
+
+			txt += JSON.stringify( data);
+
+			$( '#pageLoadJSONContent').html( txt);
+			$( '#pageLoadJSONContent').trigger( 'create');
+			$( '#pageLoadJSONContent').trigger( 'updatelayout');
+		} catch( e) {
+			alert( e);
+		}
+	}, function() {
+		$.mobile.loading( 'hide');
+
+		txt = 'Oh Mist. Es ist ein Fehler aufgetreten.';
+
+		$( '#pageLoadJSONContent').html( txt);
+		$( '#pageLoadJSONContent').trigger( 'create');
+		$( '#pageLoadJSONContent').trigger( 'updatelayout');
+	});
 });
 
 // -----------------------------------------------------------------------------
